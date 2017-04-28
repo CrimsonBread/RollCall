@@ -15,11 +15,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".TeacherActivity"
+        <activity
+            android:name=".TeacherActivity"
             android:label="@string/manage_course"
-            android:parentActivityName=".MainActivity"/>
-        <activity android:name=".StudentActivity"
-            android:parentActivityName=".MainActivity"></activity>
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".StudentActivity"
+            android:parentActivityName=".MainActivity" />
+        <activity android:name=".CourseActivity"></activity>
     </application>
 
 </manifest>

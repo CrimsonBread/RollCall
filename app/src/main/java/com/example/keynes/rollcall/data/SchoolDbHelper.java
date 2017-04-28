@@ -10,7 +10,7 @@ import com.example.keynes.rollcall.data.CourseContract.CourseEntry;
  * Created by salong on 2017/2/14.
  */
 
-public class RollCallDbHelper extends SQLiteOpenHelper {
+public class SchoolDbHelper extends SQLiteOpenHelper {
 
     /** Name of database */
     public static final String DATABASE_NAME = "school";
@@ -22,7 +22,7 @@ public class RollCallDbHelper extends SQLiteOpenHelper {
             + CourseEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + CourseEntry.COLUMN_COURSE_NAME + " TEXT NOT NULL);";
 
-    public RollCallDbHelper(Context context) {
+    public SchoolDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 

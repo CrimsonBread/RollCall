@@ -2,5 +2,11 @@
     <string name="app_name">點名系統</string>
     <string name="teacher_button">教師</string>
     <string name="student_button">學生</string>
-    <string name="manage_course">課程管理</string>
+    <string name="manage_course">課程列表</string>
+    <string name="course_roll_call">點名</string>
+    <string name="course_statistics">統計</string>
+    <string name="course_setting">設定</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
