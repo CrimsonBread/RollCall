@@ -23,6 +23,10 @@
             android:name=".StudentActivity"
             android:parentActivityName=".MainActivity" />
         <activity android:name=".CourseActivity"></activity>
+        <provider
+            android:name=".data.SchoolProvider"
+            android:authorities="com.example.keynes.rollcall"
+            android:exported="false" />
     </application>
 
 </manifest>

@@ -4,7 +4,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.example.keynes.rollcall.data.CourseContract.CourseEntry;
+import com.example.keynes.rollcall.data.SchoolContract.CourseEntry;
 
 /**
  * Created by salong on 2017/2/14.
