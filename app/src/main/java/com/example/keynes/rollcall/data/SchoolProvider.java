@@ -32,7 +32,7 @@ public class SchoolProvider extends ContentProvider {
 
     static {
         sUriMatcher.addURI(SchoolContract.CONTENT_AUTHORITY, SchoolContract.PATH_COURSE, COURSES);
-        sUriMatcher.addURI(SchoolContract.CONTENT_AUTHORITY, SchoolContract.PATH_COURSE, COURSE_ID);
+        sUriMatcher.addURI(SchoolContract.CONTENT_AUTHORITY, SchoolContract.PATH_COURSE + "/#", COURSE_ID);
     }
 
     /** Database helper object */
@@ -49,7 +49,7 @@ public class SchoolProvider extends ContentProvider {
                         String sortOrder) {
         SQLiteDatabase database = mDbHelper.getReadableDatabase();
 
-        Cursor cursor;
+        Cursor cursor = null;
 
         int match = sUriMatcher.match(uri);
 
@@ -60,13 +60,15 @@ public class SchoolProvider extends ContentProvider {
                 break;
             case COURSE_ID:
                 selection = CourseEntry._ID + "=?";
-                selectionArgs = new String[] {String.valueOf(ContentUris.parseId(uri))};
+                selectionArgs = new String[] { String.valueOf(ContentUris.parseId(uri)) };
                 cursor = database.query(CourseEntry.TABLE_NAME, projection, selection, selectionArgs,
                         null, null, sortOrder);
                 break;
             default:
                 throw new IllegalArgumentException("Cannot query unknow URI " + uri);
         }
+
+        cursor.setNotificationUri(getContext().getContentResolver(), uri);
 
         return cursor;
     }
@@ -101,19 +103,30 @@ public class SchoolProvider extends ContentProvider {
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         SQLiteDatabase database = mDbHelper.getWritableDatabase();
 
+        // Track the number of rows that were deleted
+        int rowsDeleted = 0;
+
         final int match = sUriMatcher.match(uri);
         switch (match) {
             case COURSES:
                 // Delete all rows that match the selection and selection args
-                return database.delete(CourseEntry.TABLE_NAME, selection, selectionArgs);
+                rowsDeleted = database.delete(CourseEntry.TABLE_NAME, selection, selectionArgs);
+                break;
             case COURSE_ID:
                 // Delete a single row given by the ID in the URI
                 selection = CourseEntry._ID + "=?";
                 selectionArgs = new String[] { String.valueOf(ContentUris.parseId(uri)) };
-                return database.delete(CourseEntry.TABLE_NAME, selection, selectionArgs);
+                rowsDeleted = database.delete(CourseEntry.TABLE_NAME, selection, selectionArgs);
+                break;
             default:
                 throw new IllegalArgumentException("Deletion is not supported for " + uri);
         }
+
+        if(rowsDeleted != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+
+        return rowsDeleted;
     }
 
     @Override
@@ -150,11 +163,21 @@ public class SchoolProvider extends ContentProvider {
             return null;
         }
 
+        getContext().getContentResolver().notifyChange(uri, null);
+
         return ContentUris.withAppendedId(uri, id);
     }
 
-    private int updateData(String tableName, Uri uir, ContentValues contentValues, String selection,
-                           String[] selectionArgs) {
+    private int updateData(String tableName, Uri uri, ContentValues contentValues, String selection,
+            String[] selectionArgs) {
+        // check that the name value is not null.
+        if (contentValues.containsKey(CourseEntry.COLUMN_COURSE_NAME)) {
+            String name = contentValues.getAsString(CourseEntry.COLUMN_COURSE_NAME);
+            if (name == null) {
+                throw new IllegalArgumentException("Pet requires a name");
+            }
+        }
+
         // If there are no values to update, then don't try to update the database
         if (contentValues.size() == 0) {
             return 0;
@@ -162,6 +185,13 @@ public class SchoolProvider extends ContentProvider {
 
         SQLiteDatabase database = mDbHelper.getWritableDatabase();
 
-        return database.update(tableName, contentValues, selection, selectionArgs);
+        int rowsUpdated = database.update(CourseEntry.TABLE_NAME, contentValues, selection,
+                selectionArgs);
+
+        if (rowsUpdated != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+
+        return rowsUpdated;
     }
 }

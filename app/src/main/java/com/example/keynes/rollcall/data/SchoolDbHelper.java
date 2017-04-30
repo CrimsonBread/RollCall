@@ -13,12 +13,12 @@ import com.example.keynes.rollcall.data.SchoolContract.CourseEntry;
 public class SchoolDbHelper extends SQLiteOpenHelper {
 
     /** Name of database */
-    public static final String DATABASE_NAME = "school";
+    public static final String DATABASE_NAME = "school.db";
 
     private static final int DATABASE_VERSION = 1;
 
     /** String that contains the SQL statement to create the table */
-    String SQL_CREATE_COURSE_TABLE = "CREATE TABLE " + CourseEntry.TABLE_NAME + "("
+    String SQL_CREATE_COURSE_TABLE = "CREATE TABLE " + CourseEntry.TABLE_NAME + " ("
             + CourseEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + CourseEntry.COLUMN_COURSE_NAME + " TEXT NOT NULL);";
 

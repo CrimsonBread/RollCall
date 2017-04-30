@@ -22,11 +22,14 @@
         <activity
             android:name=".StudentActivity"
             android:parentActivityName=".MainActivity" />
-        <activity android:name=".CourseActivity"></activity>
+        <activity android:name=".CourseActivity" />
+
         <provider
             android:name=".data.SchoolProvider"
             android:authorities="com.example.keynes.rollcall"
             android:exported="false" />
+
+        <activity android:name=".CourseEditorActivity"></activity>
     </application>
 
 </manifest>

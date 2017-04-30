@@ -6,7 +6,21 @@
     <string name="course_roll_call">點名</string>
     <string name="course_statistics">統計</string>
     <string name="course_setting">設定</string>
+    <string name="course_name">課程名稱</string>
+    <string name="add_course">新增課程</string>
+    <string name="edit_course">修改課程</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="hint_course_name">名稱</string>
+    <string name="editor_insert_pet_failed">新增失敗</string>
+    <string name="editor_insert_pet_successful">新增成功</string>
+    <string name="editor_update_pet_failed">更新失敗</string>
+    <string name="editor_update_pet_successful">更新成功</string>
+    <string name="delete_dialog_msg_course">是否刪除此課程?</string>
+    <string name="delete">刪除</string>
+    <string name="cancel">取消</string>
+    <string name="editor_delete_course_failed">刪除失敗</string>
+    <string name="editor_delete_course_successful">刪除成功</string>
+    <string name="delete_dialog_msg_all_course">是否刪除所有課程?</string>
 </resources>
