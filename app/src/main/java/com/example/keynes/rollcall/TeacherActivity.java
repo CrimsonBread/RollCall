@@ -19,6 +19,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.keynes.rollcall.adapter.CourseCursorAdapter;
 import com.example.keynes.rollcall.data.SchoolContract.CourseEntry;
@@ -40,6 +42,17 @@ public class TeacherActivity extends AppCompatActivity implements LoaderManager.
 
         mCourseAdapter = new CourseCursorAdapter(this, null);
         courseListView.setAdapter(mCourseAdapter);
+
+        courseListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                TextView courseName = (TextView)view.findViewById(R.id.course_name);
+
+                Intent intent = new Intent(TeacherActivity.this, CourseActivity.class);
+                intent.putExtra("course", courseName.getText().toString());
+                startActivity(intent);
+            }
+        });
 
         courseListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override

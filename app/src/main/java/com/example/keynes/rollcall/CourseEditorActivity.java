@@ -1,10 +1,16 @@
 package com.example.keynes.rollcall;
 
+import android.Manifest;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.media.Image;
 import android.net.Uri;
+import android.os.Build;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.app.NavUtils;
 import android.support.v4.content.CursorLoader;
@@ -13,21 +19,37 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.keynes.rollcall.data.SchoolContract;
+import com.example.keynes.rollcall.data.SchoolContract.StudentEntry;
 import com.example.keynes.rollcall.data.SchoolContract.CourseEntry;
+import com.opencsv.CSVReader;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 
 public class CourseEditorActivity extends AppCompatActivity implements
         LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final int EXISTING_COURSE_LOADER = 0;
+    private static final int ACTIVITY_CHOOSE_FILE = 401;
+
+    private static final String LOG_TAG = "CourseEditor";
+
+    private File mfile = null;
 
     private EditText mNameEditText;
+    private ImageButton mCsvImportButton;
 
     private Uri mCurrentCourseUri;
 
@@ -44,13 +66,27 @@ public class CourseEditorActivity extends AppCompatActivity implements
             invalidateOptionsMenu();
         } else {
             setTitle(R.string.edit_course);
+
+            mCsvImportButton = (ImageButton)findViewById(R.id.csv_import_button);
+            mCsvImportButton.setVisibility(View.INVISIBLE);
+            // Kick off the loader
+            getSupportLoaderManager().initLoader(EXISTING_COURSE_LOADER, null, this);
         }
 
+        if(mCsvImportButton == null) {
+            mCsvImportButton = (ImageButton)findViewById(R.id.csv_import_button);
+        }
         mNameEditText = (EditText)findViewById(R.id.edit_course_name);
 
-        // Kick off the loader
-        getSupportLoaderManager().initLoader(EXISTING_COURSE_LOADER, null, this);
+        mCsvImportButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                chooseCsvFile();
+            }
+        });
     }
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -77,8 +113,17 @@ public class CourseEditorActivity extends AppCompatActivity implements
         switch (item.getItemId()) {
             // Respond to a click on the "Save" menu option
             case R.id.action_save:
-                // Save pet to database
+                // Save course to database
                 saveCourse();
+                // Import student list from csv
+                if(mfile != null) {
+                    try {
+                        importCsv(mNameEditText.getText().toString().trim());
+                    } catch (IOException e) {
+                        Toast.makeText(this, "IOException", Toast.LENGTH_SHORT).show();
+                        e.printStackTrace();
+                    }
+                }
                 // Exit activity
                 finish();
                 return true;
@@ -90,6 +135,18 @@ public class CourseEditorActivity extends AppCompatActivity implements
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)  {
+        switch (requestCode) {
+            case ACTIVITY_CHOOSE_FILE:
+                if(resultCode == RESULT_OK) {
+                    Toast.makeText(this, "學生名單匯入成功", Toast.LENGTH_SHORT).show();
+                    mfile =  new File(data.getData().getPath());
+                }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     private void saveCourse() {
@@ -119,11 +176,11 @@ public class CourseEditorActivity extends AppCompatActivity implements
             // Show a toast message depending on whether or not the insertion was successful.
             if (newUri == null) {
                 // If the new content URI is null, then there was an error with insertion.
-                Toast.makeText(this, getString(R.string.editor_insert_pet_failed),
+                Toast.makeText(this, getString(R.string.editor_insert_course_failed),
                         Toast.LENGTH_SHORT).show();
             } else {
                 // Otherwise, the insertion was successful and we can display a toast.
-                Toast.makeText(this, getString(R.string.editor_insert_pet_successful),
+                Toast.makeText(this, getString(R.string.editor_insert_course_successful),
                         Toast.LENGTH_SHORT).show();
             }
         } else {
@@ -133,11 +190,11 @@ public class CourseEditorActivity extends AppCompatActivity implements
             // Show a toast message depending on whether or not the update was successful.
             if (rowsAffected == 0) {
                 // If no rows were affected, then there was an error with the update.
-                Toast.makeText(this, getString(R.string.editor_update_pet_failed),
+                Toast.makeText(this, getString(R.string.editor_update_course_failed),
                         Toast.LENGTH_SHORT).show();
             } else {
                 // Otherwise, the update was successful and we can display a toast.
-                Toast.makeText(this, getString(R.string.editor_update_pet_successful),
+                Toast.makeText(this, getString(R.string.editor_update_course_successful),
                         Toast.LENGTH_SHORT).show();
             }
         }
@@ -196,6 +253,63 @@ public class CourseEditorActivity extends AppCompatActivity implements
         finish();
     }
 
+    private void chooseCsvFile() {
+
+        isStoragePermissionGranted();
+
+        Intent it = new Intent(Intent.ACTION_GET_CONTENT);
+        it.addCategory(Intent.CATEGORY_OPENABLE);
+        it.setType("text/csv");
+        try {
+            startActivityForResult(
+                    Intent.createChooser(it, "Select a File to Upload"),
+                    ACTIVITY_CHOOSE_FILE);
+        } catch (android.content.ActivityNotFoundException ex) {
+            // Potentially direct the user to the Market with a Dialog
+            Toast.makeText(this, "Please install a File Manager.",
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void importCsv(String courseName) throws IOException {
+        ContentValues values = new ContentValues();
+        CSVReader csvReader = new CSVReader(new InputStreamReader(
+                new FileInputStream(mfile.getPath()), Charset.forName("UTF-8")));
+
+        String[] nextLine;
+        while((nextLine = csvReader.readNext()) != null) {
+            values.put(StudentEntry.COLUMN_STUDENT_COURSE_ID, courseName);
+            values.put(StudentEntry.COLUMN_STUDENT_NO, nextLine[0]);
+            values.put(StudentEntry.COLUMN_STUDENT_NAME, nextLine[1]);
+
+            Uri newUri = getContentResolver().insert(StudentEntry.CONTENT_URI_STUDENT, values);
+
+            if (newUri == null) {
+                // If the new content URI is null, then there was an error with insertion.
+                Log.e(LOG_TAG, "Failed to insert student");
+            }
+        }
+    }
+
+    public  boolean isStoragePermissionGranted() {
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    == PackageManager.PERMISSION_GRANTED) {
+                Log.v(LOG_TAG,"Permission is granted");
+                return true;
+            } else {
+
+                Log.v(LOG_TAG,"Permission is revoked");
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+                return false;
+            }
+        }
+        else { //permission is automatically granted on sdk<23 upon installation
+            Log.v(LOG_TAG,"Permission is granted");
+            return true;
+        }
+    }
+
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String[] projection = {
@@ -237,6 +351,5 @@ public class CourseEditorActivity extends AppCompatActivity implements
     public void onLoaderReset(Loader<Cursor> loader) {
         // If the loader is invalidated, clear out all the data from the input fields.
         mNameEditText.setText("");
-
     }
 }

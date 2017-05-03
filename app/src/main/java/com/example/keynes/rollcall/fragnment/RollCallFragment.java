@@ -1,11 +1,13 @@
 package com.example.keynes.rollcall.fragnment;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 
 import com.example.keynes.rollcall.R;
 
@@ -24,6 +26,7 @@ public class RollCallFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
+    private String mCourseName;
 
     public RollCallFragment() {
         // Required empty public constructor
@@ -60,7 +63,15 @@ public class RollCallFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_roll_call, container, false);
-    }
+        View rootView = inflater.inflate(R.layout.fragment_roll_call, container, false);
 
+        ListView studentListView  = (ListView)rootView.findViewById(R.id.student_list);
+
+        Intent intent = getActivity().getIntent();
+        mCourseName = intent.getStringExtra("course");
+
+        getActivity().setTitle(mCourseName);
+
+        return rootView;
+    }
 }

@@ -13,14 +13,15 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="hint_course_name">名稱</string>
-    <string name="editor_insert_pet_failed">新增失敗</string>
-    <string name="editor_insert_pet_successful">新增成功</string>
-    <string name="editor_update_pet_failed">更新失敗</string>
-    <string name="editor_update_pet_successful">更新成功</string>
+    <string name="editor_insert_course_failed">課程新增失敗</string>
+    <string name="editor_insert_course_successful">課程新增成功</string>
+    <string name="editor_update_course_failed">課程更新失敗</string>
+    <string name="editor_update_course_successful">課程更新成功</string>
     <string name="delete_dialog_msg_course">是否刪除此課程?</string>
     <string name="delete">刪除</string>
     <string name="cancel">取消</string>
     <string name="editor_delete_course_failed">刪除失敗</string>
     <string name="editor_delete_course_successful">刪除成功</string>
     <string name="delete_dialog_msg_all_course">是否刪除所有課程?</string>
+    <string name="student_list">學生名單</string>
 </resources>
