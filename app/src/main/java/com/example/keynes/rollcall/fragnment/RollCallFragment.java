@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
+import com.example.keynes.rollcall.CourseActivity;
 import com.example.keynes.rollcall.R;
 
 /**

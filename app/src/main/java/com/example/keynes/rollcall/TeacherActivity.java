@@ -25,11 +25,15 @@ import android.widget.Toast;
 import com.example.keynes.rollcall.adapter.CourseCursorAdapter;
 import com.example.keynes.rollcall.data.SchoolContract.CourseEntry;
 
+import java.util.List;
+
 import static android.R.attr.id;
 
 public class TeacherActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
 
     private static final int COURSE_LOADER = 0;
+
+    private ListView mCourseListView;
 
     private CourseCursorAdapter mCourseAdapter;
 
@@ -38,12 +42,12 @@ public class TeacherActivity extends AppCompatActivity implements LoaderManager.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_teacher);
 
-        ListView courseListView = (ListView)findViewById(R.id.course_list);
+        mCourseListView = (ListView)findViewById(R.id.course_list);
 
         mCourseAdapter = new CourseCursorAdapter(this, null);
-        courseListView.setAdapter(mCourseAdapter);
+        mCourseListView.setAdapter(mCourseAdapter);
 
-        courseListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mCourseListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 TextView courseName = (TextView)view.findViewById(R.id.course_name);
@@ -54,7 +58,7 @@ public class TeacherActivity extends AppCompatActivity implements LoaderManager.
             }
         });
 
-        courseListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+        mCourseListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
                 Intent intent = new Intent(TeacherActivity.this, CourseEditorActivity.class);

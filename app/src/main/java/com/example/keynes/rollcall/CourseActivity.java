@@ -10,6 +10,8 @@ import com.example.keynes.rollcall.adapter.CourseFragmentPagerAdapter;
 
 public class CourseActivity extends AppCompatActivity {
 
+    public boolean rollCallFlag;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -24,5 +26,11 @@ public class CourseActivity extends AppCompatActivity {
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs_course);
         tabLayout.setupWithViewPager(viewPager);
+
+        rollCallFlag = false;
+    }
+
+    public boolean getRollCallFlag() {
+        return rollCallFlag;
     }
 }

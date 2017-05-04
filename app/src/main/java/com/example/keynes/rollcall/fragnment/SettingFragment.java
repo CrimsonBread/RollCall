@@ -1,6 +1,7 @@
 package com.example.keynes.rollcall.fragnment;
 
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -10,9 +11,11 @@ import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.example.keynes.rollcall.R;
+import com.example.keynes.rollcall.StudentEditorActivity;
 import com.example.keynes.rollcall.adapter.StudentCursorAdapter;
 import com.example.keynes.rollcall.data.SchoolContract;
 import com.example.keynes.rollcall.data.SchoolContract.StudentEntry;
@@ -33,6 +36,8 @@ public class SettingFragment extends Fragment implements LoaderManager.LoaderCal
     private String mParam2;
 
     private static final int COURSE_LOADER = 0;
+
+    private ListView mSettingListView;
 
     private StudentCursorAdapter mCursorAdapter;
 
@@ -74,10 +79,18 @@ public class SettingFragment extends Fragment implements LoaderManager.LoaderCal
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_setting, container, false);
 
-        ListView settingListView = (ListView)rootView.findViewById(R.id.setting_list);
+        mSettingListView = (ListView)rootView.findViewById(R.id.setting_list);
 
         mCursorAdapter = new StudentCursorAdapter(getContext(), null);
-        settingListView.setAdapter(mCursorAdapter);
+        mSettingListView.setAdapter(mCursorAdapter);
+
+        mSettingListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Intent intent = new Intent(getActivity(), StudentEditorActivity.class);
+                startActivity(intent);
+            }
+        });
 
         // Kick off the loader
         getActivity().getSupportLoaderManager().initLoader(COURSE_LOADER, null, this);

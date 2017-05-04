@@ -24,4 +24,10 @@
     <string name="editor_delete_course_successful">刪除成功</string>
     <string name="delete_dialog_msg_all_course">是否刪除所有課程?</string>
     <string name="student_list">學生名單</string>
+    <string name="student_name">學生名稱</string>
+    <string name="hint_student_name">姓名</string>
+    <string name="student_number">學號</string>
+    <string name="hint_student_number">學號</string>
+    <string name="student_address">裝置識別碼</string>
+    <string name="hint_student_address">識別碼</string>
 </resources>
