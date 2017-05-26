@@ -23,7 +23,6 @@ public class StudentActivity extends AppCompatActivity {
     private static final String SERVICE_TYPE = "_http._tcp.";
     private static final String TAG = "StudentActivity";
     private String mServiceName = "B0242081";
-    private String mTargetServiceName;
 
     private NsdServiceInfo mService;
     private NsdHelper mNsdHelper;
@@ -33,15 +32,14 @@ public class StudentActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_student);
 
-        mNsdHelper = new NsdHelper(this);
-        mNsdHelper.initializeNsd();
-
     }
 
     @Override
     protected void onStart() {
         super.onStart();
 
+        mNsdHelper = new NsdHelper(this);
+        mNsdHelper.initializeNsd();
         mNsdHelper.discoverServices();
     }
 
@@ -70,6 +68,7 @@ public class StudentActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        Log.d(TAG, "Being destroyed.");
         super.onDestroy();
     }
 }

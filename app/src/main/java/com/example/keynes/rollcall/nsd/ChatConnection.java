@@ -7,7 +7,9 @@ import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -22,7 +24,7 @@ import java.util.concurrent.BlockingQueue;
  * Created by Keynes on 2017/5/4.
  */
 
-public class SocketConnection {
+public class ChatConnection {
 
     private Handler mUpdateHandler;
     private ChatServer mChatServer;
@@ -33,7 +35,7 @@ public class SocketConnection {
     private Socket mSocket;
     private int mPort = -1;
 
-    public SocketConnection(Handler handler) {
+    public ChatConnection(Handler handler) {
         mUpdateHandler = handler;
         mChatServer = new ChatServer(handler);
     }
@@ -50,6 +52,8 @@ public class SocketConnection {
     public void sendMessage(String msg) {
         if (mChatClient != null) {
             mChatClient.sendMessage(msg);
+        } else {
+            Log.e(TAG, "mChatClient is null");
         }
     }
 
@@ -131,7 +135,7 @@ public class SocketConnection {
                     mServerSocket = new ServerSocket(0);
                     setLocalPort(mServerSocket.getLocalPort());
 
-                    while (!Thread.currentThread().isInterrupted()) {
+                    while (true) {
                         Log.d(TAG, "ServerSocket Created, awaiting connection");
                         setSocket(mServerSocket.accept());
                         Log.d(TAG, "Connected.");
@@ -189,7 +193,7 @@ public class SocketConnection {
                         Log.d(CLIENT_TAG, "Socket already initialized. skipping!");
                     }
 
-                    mRecThread = new Thread(new ReceivingThread());
+                    mRecThread = new Thread(new ReceivingThread(mSocket));
                     mRecThread.start();
 
                 } catch (UnknownHostException e) {
@@ -210,6 +214,11 @@ public class SocketConnection {
         }
 
         class ReceivingThread implements Runnable {
+            protected Socket socket;
+
+            public ReceivingThread(Socket clientSocket) {
+                this.socket = clientSocket;
+            }
 
             @Override
             public void run() {
